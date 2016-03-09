@@ -1,0 +1,65 @@
+## Similarity score between the reviewers based on their reviews absed on the "Reviews.txt" 
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Mar  8 11:27:06 2016
+
+@author: Phanindra Kumar
+"""
+import pandas
+import math
+## Access the reviews file and process the data in the form of Data Frame
+file=open("Reviews.txt", "r")
+file_D=eval(file.read())
+df=(pandas.DataFrame(file_D)).fillna(0)
+#print (df.fillna(0))
+#print(df["Doug Redpath"])
+file.close()
+
+## The reviewer's names (Rev_list)and movies name(Movie_list) 
+##can be obtained in a easy way using df itself
+
+Rev_list= df.columns.values.tolist()
+Movie_list=df.index.values.tolist()
+
+##Similarity of user_in1 and user_in2 is computed as below
+
+def getSimilarity(user_in1,user_in2):
+    diff=0
+    tot=0
+    i=0
+    if user_in1 and user_in2 in Rev_list:
+        for i in range(len(Movie_list)-1):
+            if df[user_in1][Movie_list[i]]!=0.0 and df[user_in2][Movie_list[i]] !=0.0:
+                diff = (df[user_in1][Movie_list[i]] - df[user_in2][Movie_list[i]])
+                tot+=diff**2
+        Euclidean_Distance=math.sqrt(tot)
+    else: 
+        print("Sorry! the reviewer you entered is not in the database")
+    return Euclidean_Distance
+    
+##User input of 2 reviewers to compare and get the similarity score
+user_in1= input ("enter any 1 reviewer name you want:" )
+print("okay, you entered", user_in1)
+user_in2= input("now, enter other reviewer name to compare the similarities...:")
+a=getSimilarity(user_in1,user_in2)
+print ("Thanks! Now here it is how similarity score of reviews for",user_in1,"and",user_in2," is:", str(a) )
+
+##Method to get similarities between all the reviewers
+def getAllSimilarities(usr_choice):
+    sim_score=[]
+    names=[]
+    if usr_choice in Rev_list:
+        for i in range(len(Rev_list)-1):
+            if Rev_list[i]!=usr_choice:
+                names.append(Rev_list[i])
+                sim_score.append(getSimilarity(usr_choice,Rev_list[i]))
+        return sim_score,names
+    else: 
+        print("Sorry! the reviewer you entered is not in the database")
+        
+##TO get the similarity score when compared with other reviewers
+user_in3=input("Which reviewer do you want to compare with all others?")        
+print("okay, you chose "+ user_in3 +". The similarity scores are ")
+k,n=getAllSimilarities(user_in3)
+for i in range(len(k)):
+    print("Distance Between", user_in3,"and",n[i],"is:",str(k[i]))
